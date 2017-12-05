@@ -1,0 +1,52 @@
+SET XACT_ABORT ON 
+BEGIN TRANSACTION [Tran1]
+
+BEGIN TRY
+
+	UPDATE 
+		UsersGames 
+	SET 
+		Cash = Cash - (
+			SELECT SUM(Price) FROM Items WHERE MinLevel BETWEEN 11 AND 12
+		) 
+	WHERE Id = 110
+
+	INSERT INTO UserGameItems (UserGameId, ItemId)
+	SELECT 110, Id FROM Items WHERE MinLevel BETWEEN 11 AND 12
+
+COMMIT TRANSACTION [Tran1]
+
+END TRY
+BEGIN CATCH
+  ROLLBACK TRANSACTION [Tran1]
+END CATCH 
+GO
+
+BEGIN TRANSACTION [Tran2]
+
+BEGIN TRY
+
+	UPDATE 
+		UsersGames 
+	SET 
+		Cash = Cash - (
+			SELECT SUM(Price) FROM Items WHERE MinLevel BETWEEN 19 AND 21
+		) 
+	WHERE Id = 110
+
+	INSERT INTO UserGameItems (UserGameId, ItemId)
+	SELECT 110, Id FROM Items WHERE MinLevel BETWEEN 19 AND 21
+
+COMMIT TRANSACTION [Tran2]
+
+END TRY
+BEGIN CATCH
+  ROLLBACK TRANSACTION [Tran2]
+END CATCH 
+GO
+
+SELECT Items.Name [Item Name] 
+FROM Items 
+INNER JOIN UserGameItems ON Items.Id = UserGameItems.ItemId 
+WHERE UserGameId = 110 
+ORDER BY [Item Name]

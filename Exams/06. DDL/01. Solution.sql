@@ -1,6 +1,7 @@
 --Task 1/1
 
 create table Flights(
+	
 FlightID int primary key,
 DepartureTime datetime not null,
 ArrivalTime datetime not null,
